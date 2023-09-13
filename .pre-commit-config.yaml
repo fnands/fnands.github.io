@@ -1,8 +1,5 @@
 repos:
-- repo: https://github.com/fastai/nbdev
-  rev: 2.2.10
-  hooks:
-  - id: nbdev_clean
+
 
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v1.2.3
@@ -17,3 +14,8 @@ repos:
       description: Convert jupyter notebooks to markdown.
       entry: sh scripts/ipynb_to_md.sh
       language: system
+
+- repo: https://github.com/fastai/nbdev
+  rev: 2.2.10
+  hooks:
+  - id: nbdev_clean
