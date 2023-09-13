@@ -4,11 +4,6 @@ repos:
   hooks:
   - id: nbdev_clean
 
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v1.2.3
-  hooks:
-  - id: trailing-whitespace
-
 - repo: local
   hooks:
     - id: ipynb_to_md
@@ -16,5 +11,9 @@ repos:
       description: Convert jupyter notebooks to markdown.
       entry: sh scripts/ipynb_to_md.sh
       language: system
-      always_run: true
 
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v1.2.3
+  hooks:
+  - id: trailing-whitespace
+    exclude: _posts/.*\.md$
