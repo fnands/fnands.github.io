@@ -4,8 +4,6 @@ title: Stereo vision and disparity maps (in Julia)
 categories: [julia, coding, stereo]
 ---
 
-# Stereo vision and disparity maps (in Julia)
-
 I've been working a lot recently with stereo vision and wanted to go through the basics of how disparity is calculated. I'm mostly doing this as an excuse to get better at Julia (v1.9.3).  
 
 ## Introduction
@@ -18,7 +16,7 @@ Taking a look at the image below (from [OpenCV](https://docs.opencv.org/4.x/dd/d
 
 ![https://docs.opencv.org/4.x/dd/d53/tutorial_py_depthmap.html](../images/dispairity_block_julia/stereo_depth.jpg)
 
-If we have two identical cameras, at points $O$ and $O'$ at a distance $B$ from each other, with focal length $f$, we can calculate the distance ($Z$) to object $X$ by using the *disparity* between where the object $X$ appears in the *left* image ($x$) and where it appears in the *right* image ($x'$).  
+If we have two identical cameras, at points $$O$$ and $$O'$$ at a distance $$B$$ from each other, with focal length $$f$$, we can calculate the distance ($$Z$$) to object $$X$$ by using the *disparity* between where the object $$X$$ appears in the *left* image ($$x$$) and where it appears in the *right* image ($$x'$$).  
 
 In this simple case, the relation between disparity and distance is simply:
 
