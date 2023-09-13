@@ -4,6 +4,8 @@ title: Stereo vision and disparity maps (in Julia)
 categories: [julia, coding, stereo]
 ---
 
+# Stereo vision and disparity maps (in Julia)
+
 I've been working a lot recently with stereo vision and wanted to go through the basics of how disparity is calculated. I'm mostly doing this as an excuse to get better at Julia (v1.9.3).  
 
 ## Introduction
@@ -14,9 +16,9 @@ If we know the positions of out cameras, then we can use matching points in our 
 
 Taking a look at the image below (from [OpenCV](https://docs.opencv.org/4.x/dd/d53/tutorial_py_depthmap.html)):
 
-![https://docs.opencv.org/4.x/dd/d53/tutorial_py_depthmap.html](../images/dispairity_block_julia/stereo_depth.jpg)
+![https://docs.opencv.org/4.x/dd/d53/tutorial_py_depthmap.html](images/stereo_depth.jpg)
 
-If we have two identical cameras, at points $$O$$ and $$O'$$ at a distance $$B$$ from each other, with focal length $$f$$, we can calculate the distance ($$Z$$) to object $$X$$ by using the *disparity* between where the object $$X$$ appears in the *left* image ($$x$$) and where it appears in the *right* image ($$x'$$).  
+If we have two identical cameras, at points $O$ and $O'$ at a distance $B$ from each other, with focal length $f$, we can calculate the distance ($Z$) to object $X$ by using the *disparity* between where the object $X$ appears in the *left* image ($x$) and where it appears in the *right* image ($x'$).  
 
 In this simple case, the relation between disparity and distance is simply:
 
@@ -130,16 +132,16 @@ We usually represent the disparities for a given pair of images as a *disparity 
 In principle, this is a two-dimensional problem, as an object might be matched to a point that has both a horizontal and vertical shift, but luckily, you can always find a transformation to turn this into a one dimensional problem.  
 
 The cartoon below illustrates what a disparity map might look like: 
-![Own work](../images/dispairity_block_julia/disparity_cartoon.png)
+![Own work](images/disparity_cartoon.png)
 
 Above, we calculate the disparity with respect to the left image (you can do it with respect to the right image as well), and as you can see the disparity map tells us how many pixels to the right each object shifted to the left image vs the right image.  
 
 For a set of images (taken from the [Middlebury Stereo Datasets](https://vision.middlebury.edu/stereo/data/)):  
-![https://vision.middlebury.edu/stereo/eval/newEval/tsukuba/](../images/dispairity_block_julia/im3.png) ![https://vision.middlebury.edu/stereo/eval/newEval/tsukuba/](../images/dispairity_block_julia/im4.png)   
+![https://vision.middlebury.edu/stereo/eval/newEval/tsukuba/](images/im3.png) ![https://vision.middlebury.edu/stereo/eval/newEval/tsukuba/](images/im4.png)   
 
 The corresponding disparity map can be visualized as follows:   
 
-![https://vision.middlebury.edu/stereo/eval/newEval/tsukuba/](../images/dispairity_block_julia/groundtruth.png) 
+![https://vision.middlebury.edu/stereo/eval/newEval/tsukuba/](images/groundtruth.png) 
 
 With darker pixels having lower disparity values, and brighter pixels having higher disparity values, meaning the dark objects are far away from the cameras, while the bright ones are close.   
 
@@ -222,7 +224,7 @@ Gray.(left_image')
 
 
     
-![svg](../images/dispairity_block_julia/Stereo_vision_disparity_13_0.svg)
+![svg](../images/2023-09-10-Stereo-vision-disparity_files/2023-09-10-Stereo-vision-disparity_13_0.svg)
     
 
 
@@ -236,7 +238,7 @@ Gray.(right_image')
 
 
     
-![svg](../images/dispairity_block_julia/Stereo_vision_disparity_14_0.svg)
+![svg](../images/2023-09-10-Stereo-vision-disparity_files/2023-09-10-Stereo-vision-disparity_14_0.svg)
     
 
 
@@ -262,7 +264,7 @@ Gray.(disparity'/5)
 
 
     
-![svg](../images/dispairity_block_julia/Stereo_vision_disparity_17_0.svg)
+![svg](../images/2023-09-10-Stereo-vision-disparity_files/2023-09-10-Stereo-vision-disparity_17_0.svg)
     
 
 
@@ -332,7 +334,7 @@ Gray.(tsukuba_disparity_gray / maximum(tsukuba_disparity_gray)   )
 
 
 
-Looking at the predicted disparity, we can see there is some vague resemblance to the input image, but we're still pretty far from the target: ![https://vision.middlebury.edu/stereo/eval/newEval/tsukuba/](../images/dispairity_block_julia/groundtruth.png) 
+Looking at the predicted disparity, we can see there is some vague resemblance to the input image, but we're still pretty far from the target: ![https://vision.middlebury.edu/stereo/eval/newEval/tsukuba/](images/groundtruth.png) 
 
 
 As you can imagine, we are only comparing single channel pixels values, and it's very likely that we might just find a better match by chance. In grayscale we are only matching pixel intensity, and we have no idea whether something is bright green, or bright red. 
@@ -415,14 +417,14 @@ That's not a lot of information, and also not how we intuitively match objects.
 
 Look at the image below. Can you guess the best match for the pixel in the row of pixels below it? 
 
-![Own work](../images/dispairity_block_julia/pixel_match.png)
+![Own work](images/pixel_match.png)
 
 
 Given only this information, it's impossible for us to guess whether the green pixel matches with the pixels at location 3, 5 or 7.  
 
 If however I was to give you more context, i.e. a block of say 3x3 pixels, would this make things simpler? 
 
-![Own work](../images/dispairity_block_julia/block_match.png)
+![Own work](images/block_match.png)
 
 In this case, there is an unambiguous answer, which is the principle behind block-matching. 
 
@@ -946,4 +948,33 @@ a = [0 1 2 3 4 5 6 7 8 9]
 
 ```julia
 sum(a)
+```
+
+
+
+
+    45
+
+
+
+
+```julia
+c = end
+```
+
+
+    syntax: unexpected "end"
+
+    
+
+    Stacktrace:
+
+     [1] top-level scope
+
+       @ In[24]:1
+
+
+
+```julia
+
 ```

@@ -3,3 +3,10 @@ repos:
   rev: 2.2.10
   hooks:
   - id: nbdev_clean
+
+
+-id: ipynb_to_md
+    name: Trim Trailing Whitespace
+    description: Convert jupyter notebooks to markdown.
+    entry: scripts/ipynb_to_md.sh
+    language: bash
