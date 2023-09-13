@@ -7,8 +7,8 @@ repos:
 
 - repo: local
   hooks:
-    -id: ipynb_to_md
-        name: Trim Trailing Whitespace
-        description: Convert jupyter notebooks to markdown.
-        entry: scripts/ipynb_to_md.sh
-        language: bash
+    - id: ipynb_to_md
+      name: ipynb_to_md
+      description: Convert jupyter notebooks to markdown.
+      entry: scripts/ipynb_to_md.sh
+      language: script
