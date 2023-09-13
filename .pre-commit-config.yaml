@@ -10,5 +10,5 @@ repos:
     - id: ipynb_to_md
       name: ipynb_to_md
       description: Convert jupyter notebooks to markdown.
-      entry: scripts/ipynb_to_md.sh
-      language: script
+      entry: sh scripts/ipynb_to_md.sh
+      language: system
