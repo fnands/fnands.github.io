@@ -18,9 +18,12 @@ do
     sed -i "s/${new_name}_files/..\/images\/${new_name}_files/" notebooks/${new_name}.md
 
     mv notebooks/${new_name}.md _posts/${new_name}.md
-    rsync -a notebooks/${new_name}_files images/${new_name}_files
-
     git add _posts/${new_name}.md
-    git add images/${new_name}_files/*
+
+    if [ -d "notebooks/${new_name}_files" ]; then
+      rsync -a notebooks/${new_name}_files images/${new_name}_files
+      git add images/${new_name}_files/*
+    fi
+
   fi
 done
