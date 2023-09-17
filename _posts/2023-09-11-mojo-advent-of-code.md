@@ -31,7 +31,7 @@ So effectively a little bit of file parsing, with some basic arithmetic, i.e. a 
 At first glance, a lot of Python code will "just work": 
 
 
-```python
+```mojo
 for _ in range(10):
     print("Blah")
 ```
@@ -51,7 +51,7 @@ for _ in range(10):
 However, it's clear a lot is still missing, e.g. lambda functions don't work yet: 
 
 
-```python
+```mojo
 lambda x: x + 2
 ```
 
@@ -70,7 +70,7 @@ In this case, you have to import Python as a module and call the builtin Python 
 It's standard practice in Python to open text files with the `with open(filename) as f` incantation, but this doesn't work in Mojo, so have to open and close files manually. 
 
 
-```python
+```mojo
 from python import Python
 from math import max
 from utils.vector import DynamicVector
@@ -123,7 +123,7 @@ Once that was done I was done with Python for this program and could go forth in
 Below you can see I declare functions with `fn` while above I used `def`. Both work in Mojo, but `fn` functions forces you to be [strongly typed and enfoces some memory safe behaviour](https://docs.modular.com/mojo/manual/basics/#functions).
 
 
-```python
+```mojo
 fn part_one(calorie_list: DynamicVector[Int]) -> Int:
     """ 
     Loop over a vector of Ints, and find the grouping (split by 0) with the highest sum. 
@@ -150,7 +150,7 @@ Other than that, a relatively standard loop over a container.
 
 
 
-```python
+```mojo
 fn part_two(calorie_list: DynamicVector[Int]) -> Int:
     """
     Initialize a vector to keep track of the current top 3 elf calories. 
@@ -190,7 +190,7 @@ I'm definitely missing Python niceties like being able to easily sum over a cont
 To put it all together we create a main `fn`, and notice that we need to indicate that it might raise errors as we are calling the unsafe `read_file`. 
 
 
-```python
+```mojo
 fn main() raises:
     let file_contents: DynamicVector[Int] = read_file(
         "input/input_1.txt"
