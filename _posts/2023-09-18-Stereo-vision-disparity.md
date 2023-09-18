@@ -150,7 +150,7 @@ The ground truth disparity as shown above is usually calculated from [LiDAR](htt
 
 So let's try and calculate disparity for the images above.   
 There are many, many approaches to calculating disparity, but let us begin with the most simple approach we can think of.   
-As a start, let us go through each row of pixels in the right image, and for that pixel, try and find the most similar pixel in the left image. 
+As a start, let us go through each pixel in the right image, and for that pixel, try and find the most similar pixel in the left image. 
 
 So let us try and take the squared difference between pixels values as our similarity metric.
 As we are going to be doing the same thing for every row of pixels, we are just going to define a function that does the basic logic, and then apply the same function to every case. 
