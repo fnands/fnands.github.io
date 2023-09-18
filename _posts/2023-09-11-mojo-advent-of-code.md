@@ -1,7 +1,7 @@
 ---
 layout: post
 title: A first look at Mojo 🔥
-categories: [mojo, coding]
+categories: [mojo]
 excerpt: Taking a quick look at the new Mojo programming language. 
 ---
 
