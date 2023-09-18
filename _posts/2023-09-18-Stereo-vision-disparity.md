@@ -4,9 +4,12 @@ title: Stereo vision and disparity maps (in Julia)
 categories: [julia, coding, stereo]
 excerpt: An introduction into basic stereo vision, with a simple block matching algorithm written from scratch in Julia. 
 ---
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fnands/fnands.github.io/blob/main/notebooks/2023-09-18-Stereo-vision-disparity.ipynb/HEAD)
-I've been working a lot recently with stereo vision and wanted to go through the basics of how disparity is calculated. I'm partially doing this as an excuse to get better at Julia (v1.9.3).  
 
+
+I've been working a lot recently with stereo vision and wanted to go through the basics of how disparity is calculated. I'm partially doing this as an excuse to get better at Julia (v1.9.3 used here).  
+
+
+You can view the notebook for this blog post on Github: [![View On GitHub](../assets/github.svg)](https://github.com/fnands/fnands.github.io/blob/main/notebooks/2023-09-18-Stereo-vision-disparity.ipynb)
 
 ## Introduction
 
@@ -602,6 +605,19 @@ There are still a few things we could do to improve our simple algorithm (like o
 
 ## Conclusions
 
-Above we went through a basic introduction to stereo vision and disparity, and built a bare-bones block matching algorithm from scratch. 
+Above we went through a basic introduction to stereo vision and disparity, and built a bare-bones block matching algorithm from scratch.   
+
+The above is pretty far away from the state of the art, and there are many more advanced methods for calculating disparity, ranging from relatively simple methods like block matching to Deep Learning methods. 
+
+## Further reading
+
+Below are some posts/guides I found informative: 
+
+* [Introduction to Epipolar Geometry and Stereo Vision](https://learnopencv.com/introduction-to-epipolar-geometry-and-stereo-vision/)  
+* [Stereo Vision: Depth Estimation between object and camera](https://medium.com/analytics-vidhya/distance-estimation-cf2f2fd709d8)  
+* [Depth Map from Stereo Images](https://docs.opencv.org/4.x/dd/d53/tutorial_py_depthmap.html)  
+
+
+
 
 
