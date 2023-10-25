@@ -3,7 +3,8 @@
 # Copied from: https://gitlab.inria.fr/formations/cpp/gettingstartedwithmoderncpp/
 # This file is expected to be use as pre-commit git hook; copy it in .git/hooks/
 echo "This gets called"
-file_list=`ls notebooks/*ipynb`
+file_list=$1
+#file_list=`ls notebooks/*ipynb`
 #`git diff --diff-filter=ACM --name-only`
 
 for file in ${file_list}
