@@ -2,7 +2,7 @@
 layout: post
 title: Parameters in Mojo
 categories: [mojo]
-excerpt: The 0.4.0 update of Mojo and parameterization. 
+excerpt: The 0.4.0 update of Mojo and a look at the novel way Mojo handles parameters when compared to Python. 
 ---
 
 As Mojo is an extremely new language I want to keep track of the development, and try to learn the language as it evolves.  
