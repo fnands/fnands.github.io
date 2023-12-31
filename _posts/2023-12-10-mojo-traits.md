@@ -31,7 +31,7 @@ The trait associated with `len()` in Mojo is `Sized`, meaning that any struct co
 An example of a struct that conforms to the `Sized` trait is the builtin `String`:
 
 
-```mojo
+```python
 example_string = "This is a String and it conforms to the Sized trait."
 
 print(len(example_string))
@@ -43,7 +43,7 @@ print(len(example_string))
 Additionally, we can then write our own struct that conforms to `Sized`, and as long as it has a method named `__len__()` it will conform to the `Sized` trait (the compiler will let you know if it doesn't): 
 
 
-```mojo
+```python
 @value
 struct MySizedStruct(Sized):
     var size: Int
@@ -56,7 +56,7 @@ struct MySizedStruct(Sized):
 If we now call `len()` on an instance of this struct it will return the size value: 
 
 
-```mojo
+```python
 sized_struct = MySizedStruct(10)
 print(len(sized_struct))
 ```
@@ -68,7 +68,7 @@ As a side note, I used the `@value` decorator above which hides a bit of boilerp
 The above initialization is equivalent to: 
 
 
-```mojo
+```python
 struct MySizedStruct(Sized):
     var size: Int
 
@@ -95,7 +95,7 @@ E.g. what if I have a struct that I want to conform to both `Sized` and `Stringa
 It turns out this is easy; just pass them during as a comma 
 
 
-```mojo
+```python
 @value
 struct MySizedAndStingableStruct(Sized, Stringable):
     var size: Int
@@ -119,7 +119,7 @@ To create our own trait, we only need to define it with a method that conforming
 
 
 
-```mojo
+```python
 trait Jazzable:
     fn jazz(self): ...
 ```
@@ -130,7 +130,7 @@ It is not possible yet to define a default method, but is apparently coming in t
 Let's create a struct that conforms to Jazzable: 
 
 
-```mojo
+```python
 @value
 struct JazzX(Jazzable):
     var jazz_level: Int
@@ -158,7 +158,7 @@ ten_jazz.jazz()
 We can also define a function that calls a specific method. An example of this is the `len()` function that calls `__len__()`, we can create our own function that will call `jazz()`:
 
 
-```mojo
+```python
 fn make_it_jazz[T: Jazzable](jazz_struct: T):
     jazz_struct.jazz()
 
@@ -181,7 +181,7 @@ make_it_jazz(ten_jazz)
 Additionally, traits can inherit from other traits, and keep the functionality of the parent trait:  
 
 
-```mojo
+```python
 trait SuperJazzable(Jazzable):
     fn super_jazz(self): ...
 
@@ -203,7 +203,7 @@ struct SuperJazz(SuperJazzable):
 This new struct will have all the methods of `Jazzable`, so `make_it_jazz()` will work: 
 
 
-```mojo
+```python
 super_jazz_5 = SuperJazz(5)
 make_it_jazz(super_jazz_5)
 ```
@@ -218,7 +218,7 @@ make_it_jazz(super_jazz_5)
 And we can define additional functions that will activate the new methods as well: 
 
 
-```mojo
+```python
 fn make_it_super_jazz[T: SuperJazzable](superjazz_struct: T):
     superjazz_struct.super_jazz()
 
