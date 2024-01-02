@@ -13,7 +13,7 @@ The image below shows the spectral resolution of the panchromatic as well the th
 
 
 <figure>
-    <img src="Spectral-response-of-the-Pleiades-multispectral-MS-and-panchromatic-PAN-sensors.png"
+    <img src="../images/pansharpening_intro_python/Spectral-response-of-the-Pleiades-multispectral-MS-and-panchromatic-PAN-sensors.png"
          alt="Pleiades Spectral Bands">
     <figcaption>Pleiades spectral bands.</figcaption>
 </figure>
