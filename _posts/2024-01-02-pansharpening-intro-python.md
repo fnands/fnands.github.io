@@ -38,7 +38,7 @@ Remote sensing images are sometimes a bit unintuitive to deal with, so I will us
 ```python
 import PIL.Image as Image
 import numpy as np
-original_image = Image.open("/home/ferdi/Workspace/pansharpen/treed_brain_512.jpeg")
+original_image = Image.open("../images/pansharpening_intro_python/treed_brain_512.jpeg")
 original_width, original_height = original_image.size
 original_array = np.array(original_image)
 original_image
