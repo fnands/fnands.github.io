@@ -215,7 +215,7 @@ pansharpened_image
 
 
 
-This looks pretty good! The image is in colour, and has crips sharp edges. 
+This looks pretty good! The image is in colour, and has crisp sharp edges. 
 
 Putting these side-by-side, with the original image on the left and the pansharpened image on the right, we can see a few small differences: 
 
@@ -236,7 +236,7 @@ Image.fromarray(side_by_side.astype(np.uint8))
 
 The most prominent artefacting occurs in the white lines in the "satellites", i.e. in areas where there is a sudden change from one colour to another. 
 
-In order to more clearly see the differences betwen the two cases, let us create a difference map: 
+In order to more clearly see the differences between the two cases, let us create a difference map: 
 
 
 ```python
@@ -255,7 +255,7 @@ Image.fromarray((difference_array).astype(np.uint8), mode="RGB")
 
 
 As might be expected, the largest differences occur where colours change quickly (i.e. high gradient). 
-This is because the lower resolution sensor wil naturally average the colour information in a pixel, so the sharpness that we add to it doesn't perfectly correspond to the averaged out colour information. 
+This is because the lower resolution sensor will naturally average the colour information in a pixel, so the sharpness that we add to it doesn't perfectly correspond to the averaged out colour information. 
 
 ## Conclusions
 
