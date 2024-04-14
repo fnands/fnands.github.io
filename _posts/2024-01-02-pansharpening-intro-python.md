@@ -118,7 +118,7 @@ So how can we add back sharpness to the image on the right?
 
 One of the simplest (and most widely used) methods for pansharpening is called the Brovey transformation. For reference, it is the default pansharpening operation in [GDAL](https://gdal.org/index.html).
 
-To do a Brovey transform you need to upsample the multispectral image so your images have the same resoltuion. 
+To do a Brovey transform you need to upsample the multispectral image so your images have the same resolution. 
 
 We did this above, but to confirm let us check the resolutions of our images: 
 
