@@ -8,7 +8,7 @@ excerpt: There's currently no direct way of reading image files from Mojo. In th
 So for the past while I've been trying to follow along with the development of Mojo, but so far I've mostly just followed along with the changelog and written some pretty trivial pieces of code. 
 In my last post I said I wanted to try something a bit more substantial, so here goes. 
 
-I was looking at the [Basalt](https://github.com/basalt-org/basalt) project, which tries to build a Machine Learning framework in pure Mojo, and realized that the only images used so far were MNIST, which come in a weird binary format anyway. Why no other though? As Mojo does not yet support accelerators (like GPUs) Imagenet is probably impractical, but it should be fairly quick to train a CNN on CIFAR-10 on a CPU these days. The CIFAR-10 dataset is available from the [original source](https://www.cs.toronto.edu/~kriz/cifar.html) as either a pickle archive or some custom binary format. I though about writing datasets for these, but it might be more useful to write a PNG parser in Mojo, and then use the version of the dataset hosted on [Kaggle](https://www.kaggle.com/c/cifar-10/). That way the code can be used to open PNG images in general.    
+I was looking at the [Basalt](https://github.com/basalt-org/basalt) project, which tries to build a Machine Learning framework in pure Mojo, and realized that the only images used so far were MNIST, which come in a weird binary format anyway. Why no other though? As Mojo does not yet support accelerators (like GPUs) Imagenet is probably impractical, but it should be fairly quick to train a CNN on something like CIFAR-10 on a CPU these days. The CIFAR-10 dataset is available from the [original source](https://www.cs.toronto.edu/~kriz/cifar.html) as either a pickle archive or some custom binary format. I though about writing decoders for these, but it might be more useful to write a PNG parser in Mojo, and then use the version of the dataset hosted on [Kaggle](https://www.kaggle.com/c/cifar-10/) and other places, or just transform the original to PNGs using [this package](https://github.com/knjcode/cifar2png). That way the code can be used to open PNG images in general.    
 
 
 # A PNG parser in (pure-ish) Mojo
@@ -278,7 +278,7 @@ Now, reading parts of each chunk will get repetitive, so let's define a struct c
 
 
 ```mojo
-struct Chunk:
+struct Chunk(Movable, Copyable):
     var length: UInt32
     var type: String
     var data: List[Int8]
@@ -291,6 +291,20 @@ struct Chunk:
         self.data = data
         self.crc = crc
         self.end = end
+
+    fn __moveinit__(inout self, owned existing: Chunk):
+        self.length = existing.length
+        self.type = existing.type
+        self.data = existing.data
+        self.crc = existing.crc
+        self.end = existing.end
+
+    fn __copyinit__(inout self, existing: Chunk):
+        self.length = existing.length
+        self.type = existing.type
+        self.data = existing.data
+        self.crc = existing.crc
+        self.end = existing.end
 
 
 def parse_next_chunk(owned data: List[Int8], read_head: Int) -> Chunk:
@@ -774,10 +788,108 @@ read_head = end_chunk.end
 
 ## Putting it all together. 
 
+Let's package the logic above up a bit more nicely. I'm thinking something that resembles PIL. 
+
+Well start with a struct called `PNGImage`
+
 
 ```mojo
 
+fn determine_file_type(data: List[Int8]) -> String:
+
+    if bytes_to_string(data[0:8]) == String("\x89PNG\x0d\x0a\x1a\x0a"):
+        return "PNG"
+    else:
+        return "Unknown"
+
+struct PNGImage:
+    var image_path: Path
+    var raw_data: List[Int8]
+    var width: UInt32
+    var height: UInt32
+    var bit_depth: UInt8
+    var color_type: UInt8
+    var compression_method: UInt8
+    var filter_method: UInt8
+    var interlaced: UInt8
+
+
+    var gamma: UInt32
+    var chromacity: UInt32
+    var background: UInt32
+    var pixel_size: UInt32
+
+    var data: Chunk
+
+
+    fn __init__(inout self, file_name: Path) raises:
+
+        self.image_path = file_name
+        assert_true(self.image_path.exists(), "File does not exist")
+
+        with open(self.image_path , "r") as image_file:
+            self.raw_data = image_file.read_bytes()
+
+        assert_true(determine_file_type(self.raw_data) == "PNG", "File is not a PNG. Only PNGs are supported")
+
+        var read_head = 8
+
+        var header_chunk = parse_next_chunk(self.raw_data, read_head)
+        read_head = header_chunk.end
+
+        self.width = bytes_to_uint32_be(header_chunk.data[0:4])[0]
+        self.height = bytes_to_uint32_be(header_chunk.data[4:8])[0]
+        self.bit_depth = header_chunk.data[8].cast[DType.uint8]()
+        self.color_type = header_chunk.data[9].cast[DType.uint8]()
+        self.compression_method = header_chunk.data[10].cast[DType.uint8]()
+        self.filter_method = header_chunk.data[11].cast[DType.uint8]()
+        self.interlaced = header_chunk.data[12].cast[DType.uint8]()
+
+        # Check if the image is interlaced
+        assert_true(self.interlaced == 0, "Interlaced images are not supported")
+
+        # Scan over chunks until end found
+        var ended = False
+        while read_head < len(self.raw_data) and not ended:
+            var chunk = parse_next_chunk(self.raw_data, read_head)
+            read_head = chunk.end
+
+            # Parse additional chunks
+            if chunk.type == "gAMA":
+                self.gamma = bytes_to_uint32_be(chunk.data)[0]
+            elif chunk.type == "cHRM":
+                self.chromacity = bytes_to_uint32_be(chunk.data)[0]
+            elif chunk.type == "bKGD":
+                self.background = bytes_to_uint32_be(chunk.data)[0]
+            elif chunk.type == "pHYs":
+                self.pixel_size = bytes_to_uint32_be(chunk.data)[0]
+            elif chunk.type == "IDAT":
+                self.data = chunk^
+            elif chunk.type == "IEND":
+                ended = True
+
+        assert_true(ended, "IEND chunk not found")
+
+
+
+
+
+
+    # In case the filename is passed as a string
+    fn __init__(inout self, file_name: String) raises:
+        self.__init__(Path(file_name))
 ```
+
+    error: [0;1;31m[1mExpression [44]:22:8: [0m[1m'self.width' is uninitialized at the implicit return from this function
+    [0m    fn __init__(inout self, file_name: Path) raises:
+    [0;1;32m       ^
+    [0m[0m
+
+    [0;1;30m[1mExpression [44]:22:23: [0m[1m'self' declared here
+    [0m    fn __init__(inout self, file_name: Path) raises:
+    [0;1;32m                      ^
+    [0m[0m
+    expression failed to parse (no further compiler diagnostics)
 
 
 ```mojo
