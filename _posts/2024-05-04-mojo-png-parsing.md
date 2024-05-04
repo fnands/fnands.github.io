@@ -8,14 +8,14 @@ excerpt: There's currently no direct way of reading image files from Mojo. In th
 So for the past while I've been trying to follow along with the development of Mojo, but so far I've mostly just followed along with the changelog and written some pretty trivial pieces of code. 
 In my last post I said I wanted to try something a bit more substantial, so here goes. 
 
-I was looking at the [Basalt](https://github.com/basalt-org/basalt) project, which tries to build a Machine Learning framework in pure Mojo, and realized that the only images used so far were MNIST, which come in a weird binary format anyway. Why no other though? As Mojo does not yet support accelerators (like GPUs) Imagenet is probably impractical, but it should be fairly quick to train a CNN on something like CIFAR-10 on a CPU these days. The CIFAR-10 dataset is available from the [original source](https://www.cs.toronto.edu/~kriz/cifar.html) as either a pickle archive or some custom binary format. I though about writing decoders for these, but it might be more useful to write a PNG parser in Mojo, and then use the version of the dataset hosted on [Kaggle](https://www.kaggle.com/c/cifar-10/) and other places, or just transform the original to PNGs using [this package](https://github.com/knjcode/cifar2png). That way the code can be used to open PNG images in general.    
+I was looking at the [Basalt](https://github.com/basalt-org/basalt) project, which tries to build a Machine Learning framework in pure Mojo, and realized that the only images used so far were MNIST, which come in a weird binary format anyway. Why no other though? As Mojo does not yet support accelerators (like GPUs) Imagenet is probably impractical, but it should be fairly quick to train a CNN on something like CIFAR-10 on a CPU these days. The CIFAR-10 dataset is available from the [original source](https://www.cs.toronto.edu/~kriz/cifar.html) as either a pickle archive or some custom binary format. I thought about writing decoders for these, but it might be more useful to write a PNG parser in Mojo, and then use the version of the dataset hosted on [Kaggle](https://www.kaggle.com/c/cifar-10/) and other places, or just transform the original to PNGs using [this package](https://github.com/knjcode/cifar2png). That way the code can be used to open PNG images in general.    
 
 
 # A PNG parser in (pure-ish) Mojo
 
 Don't mistake this post for a tutorial: read it as someone discovering the gory details of the PNG standard while learning a new language. If you want to read more about the PNG format, the [wikipedia page](https://en.wikipedia.org/wiki/PNG) is pretty helpful as an overview, and the [W3C page](https://www.w3.org/TR/png/) provides a lot of detail. 
 
-For reference, this was written with Mojo `24.3.0`, and as Mojo is still changing pretty fast a lot of what is done below might be outdated. I actually I did basically the entire post in `24.2.1` but `24.3` got released just before I published, but it required only minor changes to update. 
+For reference, this was written with Mojo `24.3.0`, and as Mojo is still changing pretty fast a lot of what is done below might be outdated. I actually I did basically the entire post in `24.2.1` but `24.3` got released just before I published, but it required only minor changes to make it work in the new version. 
 
 The goal here is not to build a tool to display PNGs, but just to read them into an array (or tensor) that can be used for ML purposes, so I will skip over a lot of the more display oriented details. 
 
@@ -475,7 +475,7 @@ uncompressed_data = uncompress(image_data_chunk.data, quiet=False)
 
 
 Now we have a list of uncompressed bytes. However, these are not pixel values yet. 
-The uncompressed data has a length of 49280 bytes. We know we have an RGB image with 8-bit colour depth, so expect $$128 * 128 * 3 = 49152$$ bytes worth of pixel data. Notice that $49280 - 49152 = 128$, and that our image has a shape of `(128, 128)`.  
+The uncompressed data has a length of 49280 bytes. We know we have an RGB image with 8-bit colour depth, so expect $$128 * 128 * 3 = 49152$$ bytes worth of pixel data. Notice that $$49280 - 49152 = 128$$, and that our image has a shape of `(128, 128)`.  
 These extra 128 bytes are to let us know what filter was used to transform the byte values each line of pixels (knows as scanlines) into something that can be efficiently compressed.  
 
 ### Unfilter
