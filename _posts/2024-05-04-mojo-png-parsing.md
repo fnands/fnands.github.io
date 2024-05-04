@@ -981,6 +981,8 @@ This is one of those points where I don't feel I know what the idiomatic way to 
 
 ## Conclusions
 
+Reading PNGs was quite a fun topic for a blog post. It made me really get my hands dirty with some of the more low level concepts in Mojo, something I felt I didn't fully grasp before. 
+
 I'll admit, this ended up being a bit more work than I expected. To paraphrase JFK:   
 
 ![jfk_meme](../images/png_read_mojo/JFK.jpeg "We do these things not because they are easy, but because we thought they were going to be easy.")
@@ -999,23 +1001,3 @@ I refactored the code from this blog post a bit and wrote it up into a library I
 The next steps will likely be adding support to Mimage for 16-bit PNGs and JPEGs. The long term goal would be to be able to read and write all the same image formats as Python's [Pillow](https://github.com/python-pillow/Pillow), but that will likely take a long time to reach. As I am on the ML side of things, I'll try and focus on the formats and functionality needed for ML purposes, like being able to read all the images in the Imagenet dataset. 
 
 
-
-
-```mojo
-
-```
-
-
-```mojo
-
-```
-
-
-```mojo
-
-```
-
-
-```mojo
-
-```
