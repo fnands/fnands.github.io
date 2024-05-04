@@ -565,7 +565,8 @@ Now that we have the general idea of things, let's write this more generally, an
 For an idea of how filters are chosen, read this stackoverflow post and the resources it points to: [How do PNG encoders pick which filter to use?](https://stackoverflow.com/questions/59492926/how-do-png-encoders-pick-which-filter-to-use)
 
 I've done these as functions that take 16-bit signed integers. This is important mostly for the case of the Paeth filter, where the standard states: 
-> The calculations within the PaethPredictor function must be performed exactly, without overflow. Arithmetic modulo 256 is to be used only for the final step of subtracting the function result from the target byte value.
+> The calculations within the PaethPredictor function must be performed exactly, without overflow. Arithmetic modulo 256 is to be used only for the final step of subtracting the function result from the target byte value.  
+
 So basically we need to keep a higher level of precision and then cast back to bytes at the end. 
 
 
