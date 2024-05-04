@@ -29,7 +29,7 @@ This is a relatively simple PNG, so it should be a good place to start.
 Now that Mojo has implemented it's version of pathlib in the stdlib, we can actually check if the file exists: 
 
 
-```mojo
+```python
 from pathlib import Path
 test_image = Path('../images/png_read_mojo/hopper.png')
 print(test_image.exists())
@@ -41,7 +41,7 @@ print(test_image.exists())
 We'll also import the image via Python so we can compare if the outputs we get match the Python case. 
 
 
-```mojo
+```python
 from python import Python
 var Image = Python.import_module('PIL.Image')
 var np = Python.import_module('numpy')
@@ -51,7 +51,7 @@ py_array = np.array(Image.open("../images/png_read_mojo/hopper.png"))
 We're going to read the raw bytes. I would have expected the data to be **unsigned** 8-bit integers, but Mojo reads them as **signed** 8-bit integers. There is however a [proposal to change this](https://github.com/modularml/mojo/pull/2099), so this might change soon. 
 
 
-```mojo
+```python
 with open(test_image, "r") as f:
     file_contents = f.read_bytes()
 
@@ -67,7 +67,7 @@ print(len(file_contents))
 PNG files have a signature defined in the first 8-bytes, part of which is the letters PNG in ASCII. Well define a little helper function to convert from bytes to String: 
 
 
-```mojo
+```python
 fn bytes_to_string(list: List[Int8]) -> String:
     var word = String("")
     for letter in list:
@@ -80,7 +80,7 @@ fn bytes_to_string(list: List[Int8]) -> String:
 To make sure we are actually dealing with a PNG, we can check the bits 1 to 3:
 
 
-```mojo
+```python
 png_signature = file_contents[0:8]
 print(bytes_to_string(png_signature[1:4]))
 
@@ -106,7 +106,7 @@ When reading in data with `read_bytes`, the data comes as a list of signed 8-bit
 
 
 
-```mojo
+```python
 from math.bit import bswap, bitreverse
 from testing import assert_true
 
@@ -139,7 +139,7 @@ The firs chunk after the file header should always be the image header, so let's
 Let's see how long the first chunk is: 
 
 
-```mojo
+```python
 read_head = 8
 chunk_length = bytes_to_uint32_be(file_contents[read_head:read_head+4])[0]
 print(chunk_length)
@@ -152,7 +152,7 @@ So the first chunk is 13 bytes long. Let's see what type it is:
 
 
 
-```mojo
+```python
 
 chunk_type = file_contents[read_head+4:read_head+8]
 print(bytes_to_string(chunk_type))
@@ -164,7 +164,7 @@ print(bytes_to_string(chunk_type))
 IHDR, which confirms that this chunk is the image header. We can now parse the next 13 bytes of header data to get information about the image: 
 
 
-```mojo
+```python
 start_header = int(read_head+8)
 end_header = int(read_head+8+chunk_length)
 header_data = file_contents[start_header:end_header]
@@ -173,7 +173,7 @@ header_data = file_contents[start_header:end_header]
 The first two chunks tell us the width and height of the image respectively:
 
 
-```mojo
+```python
 print("Image width: ", bytes_to_uint32_be(header_data[0:4])[0])
 print("Image height: ", bytes_to_uint32_be(header_data[4:8])[0])
 ```
@@ -187,7 +187,7 @@ So our image is 128x128 pixels in size.
 The next bytes tell is  the bit depth of each pixel, color type, compression method, filter method, and whether the image is interlaced or not. 
 
 
-```mojo
+```python
 print("Bit depth: ", int(header_data[8]))
 print("Color type: ", int(header_data[9]))
 print("Compression method: ", int(header_data[10]))
@@ -232,7 +232,7 @@ I have a feeling I won't be dealing with interlaced files in this post...
 The final part of this chunk is the CRC32 value, which is the 32-bit [cyclic redundancy check](https://en.wikipedia.org/wiki/Cyclic_redundancy_check). I don't go into too much details, but it's basically an error-detecting code that's added to detect if the chunk data is corrupt. By checking the provided CRC32 value against one we calculate ourselves we can ensure that the data we are reading is not corrupt. 
 
 
-```mojo
+```python
 start_crc = int(read_head+8+chunk_length)
 end_crc = int(start_crc+4)
 header_crc = bytes_to_uint32_be(file_contents[start_crc:end_crc])[0]
@@ -247,7 +247,7 @@ This is not the most efficient implementation, but it is simple.
 I'll probably do a follow up post where I explain what this does in more detail. 
 
 
-```mojo
+```python
 fn CRC32(owned data: List[SIMD[DType.int8, 1]], value: SIMD[DType.uint32, 1] = 0xffffffff) -> SIMD[DType.uint32, 1]:
     var crc32 = value
     for byte in data:
@@ -263,7 +263,7 @@ fn CRC32(owned data: List[SIMD[DType.int8, 1]], value: SIMD[DType.uint32, 1] = 0
 ```
 
 
-```mojo
+```python
 print(hex(CRC32(file_contents[read_head+4:end_header])))
 ```
 
@@ -277,7 +277,7 @@ Great, so the CRC hexes match, so we know that the data in our IHDR chunk is goo
 Now, reading parts of each chunk will get repetitive, so let's define a struct called `Chunk` to hold the information contained in a chunk, and a function that will parse chunks for us and return the constituent parts: 
 
 
-```mojo
+```python
 struct Chunk(Movable, Copyable):
     var length: UInt32
     var type: String
@@ -328,7 +328,7 @@ During chunk creation the CRC32 value for the chunk data is computed, and an iss
 Let's test this to see if it parses the IHDR chunk: 
 
 
-```mojo
+```python
 var header_chunk = parse_next_chunk(file_contents, 8)
 print(header_chunk.type)
 read_head = header_chunk.end
@@ -340,7 +340,7 @@ read_head = header_chunk.end
 The next few chunks are called "Ancillary chunks", and are not strictly necessary. They contain image attributes (like [gamma](https://en.wikipedia.org/wiki/Gamma_correction)) that may be used in rendering the image: 
 
 
-```mojo
+```python
 var gamma_chunk = parse_next_chunk(file_contents, read_head)
 print(gamma_chunk.type)
 read_head = gamma_chunk.end
@@ -350,7 +350,7 @@ read_head = gamma_chunk.end
 
 
 
-```mojo
+```python
 var chromacity_chunk = parse_next_chunk(file_contents, read_head)
 print(chromacity_chunk.type)
 read_head = chromacity_chunk.end
@@ -360,7 +360,7 @@ read_head = chromacity_chunk.end
 
 
 
-```mojo
+```python
 var background_chunk = parse_next_chunk(file_contents, read_head)
 print(background_chunk.type)
 read_head = background_chunk.end
@@ -370,7 +370,7 @@ read_head = background_chunk.end
 
 
 
-```mojo
+```python
 var pixel_size_chunk = parse_next_chunk(file_contents, read_head)
 print(pixel_size_chunk.type)
 read_head = pixel_size_chunk.end
@@ -386,7 +386,7 @@ The IDAT chunk (there can actually be several of them per image) contains the ac
 
 
 
-```mojo
+```python
 var image_data_chunk = parse_next_chunk(file_contents, read_head)
 print(image_data_chunk.type)
 read_head = image_data_chunk.end
@@ -408,7 +408,7 @@ So for the moment, I am using the [zlib](https://en.wikipedia.org/wiki/Zlib) ver
 The following I lightly adapted from the Mojo discord from a thread between Ilya Lubenets and Jack Clayton:
 
 
-```mojo
+```python
 from sys import ffi
 alias Bytef = Scalar[DType.int8]
 alias uLong = UInt64
@@ -466,7 +466,7 @@ fn uncompress(data: List[Int8], quiet: Bool = True) raises -> List[UInt8]:
 Drumroll... let's see if this worked:
 
 
-```mojo
+```python
 uncompressed_data = uncompress(image_data_chunk.data, quiet=False)
 ```
 
@@ -518,7 +518,7 @@ Now that we know that, let's look at our first byte value:
 
 
 
-```mojo
+```python
 print(uncompressed_data[0])
 ```
 
@@ -529,7 +529,7 @@ So we are dealing with filter type 1 here.
 Let's decode the first row:
 
 
-```mojo
+```python
 var filter_type = uncompressed_data[0]
 var scanline = uncompressed_data[1:128*3+1]
 
@@ -554,7 +554,7 @@ for i in range(len(scanline)):
 And let's confirm that the row we decoded is the same as PIL would do: 
 
 
-```mojo
+```python
 for i in range(128):
     for j in range(3):
         assert_true(result[i*3+j] == py_array[0][i][j].__int__(), "Pixel values do not match")
@@ -572,7 +572,7 @@ So basically we need to keep a higher level of precision and then cast back to b
 I based the implementation on the [iPXE](https://ipxe.org/) implementation of a [png decoder](https://dox.ipxe.org/png_8c_source.html) written in C. 
 
 
-```mojo
+```python
 from math import abs
 
 fn undo_trivial(current: Int16, left: Int16 = 0, above: Int16 = 0, above_left: Int16 = 0) -> Int16:
@@ -629,7 +629,7 @@ For the `undo_filter` function, I was trying to add the separate filters to some
 So let's apply these to the whole image and confirm that we have the same results as we would get from Python: 
 
 
-```mojo
+```python
 
 # Decoded image data
 # take the first pixels as 0
@@ -676,7 +676,7 @@ Now ideally we want the above into a Tensor.
 Lets write a function that will parse the image data and return a Tensor for us. 
 
 
-```mojo
+```python
 from tensor import Tensor, TensorSpec, TensorShape
 from utils.index import Index
 from random import rand
@@ -691,7 +691,7 @@ var tensor_image = Tensor[DType.uint8](spec)
 ```
 
 
-```mojo
+```python
 # Decoded image data
 # take the first pixels as 0
 var pixel_size: Int = 3
@@ -727,7 +727,7 @@ for line in range(128):
 I'm not entirely sure why I need to use `Index` while setting items, but when getting I can just provide indices: 
 
 
-```mojo
+```python
 print(tensor_image[0,1,2])
 print(py_array[0][1][2])
 ```
@@ -742,7 +742,7 @@ And there we have it. I will put it all together soon but let's finish parsing t
 There are a few more chunks at this point: text chunks which hold some comments, and an end chunk, which denotes the end of the file: 
 
 
-```mojo
+```python
 var text_chunk_1 = parse_next_chunk(file_contents, read_head)
 print(text_chunk_1.type)
 read_head = text_chunk_1.end
@@ -754,7 +754,7 @@ print(bytes_to_string(text_chunk_1.data))
 
 
 
-```mojo
+```python
 var text_chunk_2 = parse_next_chunk(file_contents, read_head)
 print(text_chunk_2.type)
 read_head = text_chunk_2.end
@@ -766,7 +766,7 @@ print(bytes_to_string(text_chunk_2.data))
 
 
 
-```mojo
+```python
 var text_chunk_3 = parse_next_chunk(file_contents, read_head)
 print(text_chunk_3.type)
 read_head = text_chunk_3.end
@@ -780,7 +780,7 @@ print(bytes_to_string(text_chunk_3.data))
 The text chunks above actually have more info, but seem to be UTF-8 encoded, and Mojo just seems to handle ASCII? 
 
 
-```mojo
+```python
 var end_chunk = parse_next_chunk(file_contents, read_head)
 print(end_chunk.type)
 read_head = end_chunk.end
@@ -796,7 +796,7 @@ Let's package the logic above up a bit more nicely. I'm thinking something that 
 Well start with a struct called `PNGImage`
 
 
-```mojo
+```python
 
 fn bytes_to_hex_string(list: List[Int8]) -> String:
     var word = String("")
@@ -943,7 +943,7 @@ struct PNGImage:
 Well, it's not the prettiest, but let's see if it works: 
 
 
-```mojo
+```python
 var hopper = PNGImage(test_image)
 hopper_tensor = hopper.to_tensor()
 
@@ -958,7 +958,7 @@ If the above runs, then it means we read the image correctly!
 Let's try on a PNG image from the CIFAR-10 dataset: 
 
 
-```mojo
+```python
 cifar_image = Path('../images/png_read_mojo/114_automobile.png')
 var cifar = PNGImage(cifar_image)
 cifar_tensor = cifar.to_tensor()
