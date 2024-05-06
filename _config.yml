@@ -22,16 +22,16 @@ avatar: https://avatars.githubusercontent.com/u/3948531?v=4
 # Includes an icon in the footer for each username you enter
 footer-links:
   dribbble:
-  email: 
+  email:
   facebook:
   flickr:
   github: fnands
   instagram:
-  linkedin: 
+  linkedin:
   pinterest:
   rss: rss
   twitter: f_nan_d
-  stackoverflow: 
+  stackoverflow:
   youtube: # channel/<your_long_string> or user/<user-name>
   googleplus: # anything in your profile username that comes after plus.google.com/
   playconsole:
@@ -39,7 +39,7 @@ footer-links:
 
 # Enter your Disqus shortname (not your username) to enable commenting on posts
 # You can find your shortname on the Settings page of your Disqus account
-disqus: 
+disqus:
 
 # Enter your Google Analytics web tracking code (e.g. UA-2110908-2) to activate tracking
 # google_analytics: UA-43339302-11
@@ -51,6 +51,7 @@ disqus:
 # Used for Sitemap.xml and your RSS feed
 url: http://www.fnands.com
 enforce_ssl: https://www.fnands.com
+encoding: utf-8
 
 # If you're hosting your site at a Project repository on GitHub pages
 # (http://yourusername.github.io/repository-name)
